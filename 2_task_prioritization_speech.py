@@ -1,3 +1,4 @@
+# Import required libraries
 import os
 from openai import OpenAI
 import rospy
@@ -5,20 +6,19 @@ from qt_robot_interface.srv import speech_say
 import csv
 from datetime import datetime
 
-# Initialize ROS node
+# Initialize ROS node for QTrobot communication
 rospy.init_node('qtrobot_chatgpt_chatbot')
 
-# Set up OpenAI API
+# Initialize OpenAI client with API key
 client = OpenAI(api_key="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")
 
-# Get the current date using a system call
+# Get current date from system
 current_date = os.popen('date +%Y-%m-%d').read().strip()
-# print(current_date)
 
-# Set up QTrobot speech service
+# Connect to QTrobot's text-to-speech service
 say_service = rospy.ServiceProxy('/qt_robot/speech/say', speech_say)
 
-# Initialize conversation history
+# Initialize conversation with system prompt defining QTrobot's personality and behavior
 conversation_history = [
     {"role": "system", "content": f"""You are QTrobot, a humanoid social robot assistant designed to support college students and young adults with ADHD. 
     You are helpful, creative, clever, cute, and very friendly. Always maintain this role and never break character, even if asked to do so.
@@ -64,6 +64,7 @@ conversation_history = [
     - Remember to be helpful and supportive throughout the interaction, focusing on assisting the student in organizing their tasks effectively."""}
 ]
 
+# Send user prompt to GPT and get response while maintaining conversation history
 def chat_with_gpt(prompt):
     global conversation_history
     conversation_history.append({"role": "user", "content": prompt})
@@ -77,6 +78,7 @@ def chat_with_gpt(prompt):
     conversation_history.append({"role": "assistant", "content": ai_response})
     return ai_response
 
+# Save prioritized tasks to CSV file
 def save_tasks_to_csv(tasks):
     filename = f"2_prioritized_tasks.csv"
     with open(filename, 'w', newline='') as csvfile:
@@ -86,6 +88,7 @@ def save_tasks_to_csv(tasks):
             writer.writerow(task)
     print(f"Tasks saved to {filename}")
 
+# Parse task list from AI response into structured format
 def parse_task_list(response):
     tasks = []
     for line in response.split('\n'):
@@ -99,6 +102,9 @@ def parse_task_list(response):
                     deadline = task_and_deadline[1]
                     tasks.append([priority, task_name, deadline])
     return tasks
+
+# Main function to run the chatbot interface
+# Handles user interaction, task collection, and saving results
 
 def main():
     print("Type 'exit' to end the conversation")
@@ -124,6 +130,7 @@ def main():
             print("QTrobot:", response)
             say_service(response)
     
+    # Save tasks if any were collected
     if tasks:
         save_tasks_to_csv(tasks)
 

@@ -12,13 +12,17 @@ import time
 from engagement_main import MainApp
 from emotion_main import EmotionMonitor
 
+# Print a visual divider line for better UI readability
 def print_divider():
     print("==========================================")
 
+# Display welcome message and introduce QTrobot's capabilities
 def print_intro():
     print("Welcome! I am QTrobot, a humanoid social robot assistant designed to support college students and young adults with ADHD.")
     print("I am a productivity coach bot that can help you prioritize tasks and generate a schedule.")
 
+# Handle user login by validating credentials against stored user data
+# Returns: True if login successful, False otherwise
 def login():
     print("=====================login=====================")
     username = input("Enter your username: ")
@@ -34,6 +38,7 @@ def login():
     print("Invalid username or password. Please try again.")
     return False
 
+# Handle new user registration with input validation
 def signup():
     print("=====================Sign Up=====================")
     while True:
@@ -46,6 +51,7 @@ def signup():
         else:
             print("Error: Username must be between 4 and 25 characters. Please try again.")
 
+    # Password validation loop
     while True:
         password = getpass.getpass("Enter a password (4-25 characters): ")
         if 4 <= len(password) <= 25:
@@ -53,12 +59,14 @@ def signup():
         else:
             print("Error: Password must be between 4 and 25 characters. Please try again.")
 
+    # Save new user credentials
     with open("0_userinfo.csv", "a", newline='') as file:
         csv_writer = csv.writer(file)
         csv_writer.writerow([username, password])
     
     print("Sign up successful! Log in with the registered information.")
 
+# Check if username already exists in the system
 def username_exists(username):
     with open("0_userinfo.csv", "r") as file:
         csv_reader = csv.reader(file)
@@ -67,6 +75,7 @@ def username_exists(username):
                 return True
     return False
 
+# Retrieve tasks from previous day
 def get_yesterday_tasks():
     yesterday = (datetime.now() - timedelta(days=1)).strftime('%a, %b %d')
     yesterday_tasks = []
@@ -79,7 +88,9 @@ def get_yesterday_tasks():
                 print(row)
     return yesterday_tasks
 
+# Determine user's progress in the system and provide appropriate welcome message
 def check_returning_user():
+    # List of files that indicate user progress
     files_to_check = [
         "1_calendar_items.csv",
         "2_prioritized_tasks.csv",
@@ -88,6 +99,7 @@ def check_returning_user():
     
     completed_steps = 0
     
+    # Check which steps user has completed
     for i, file in enumerate(files_to_check, start=1):
         if os.path.exists(file):
             completed_steps = i
@@ -97,6 +109,7 @@ def check_returning_user():
     if os.path.exists("5_block_on_cal.csv"):
         completed_steps = 5
     
+    # Display appropriate welcome message based on user progress
     if completed_steps == 0:
         print("Welcome, new user! Let's get started with importing your schedule from Google Calendar.")
     elif completed_steps == 1:
@@ -114,6 +127,7 @@ def check_returning_user():
 
     print_divider()
 
+# Display main menu options
 def print_menu():
     print("Please enter the number to select the task that you want to execute:")
     print("1. Import your current schedule from Google Calendar")
@@ -125,6 +139,7 @@ def print_menu():
     print("7. Start a focus session")
     print("Enter 'exit' to quit")
 
+# Execute user's menu choice with appropriate validation
 def execute_menu(choice):
     if choice == '1':
         subprocess.run(['python', '1_fetch_events.py'])
@@ -153,7 +168,6 @@ def execute_menu(choice):
             print("You must complete step 5 before this step.")
     elif choice == '7':
         if os.path.exists("2_prioritized_tasks.csv"):
-            #run Mira's code
             # Initialize a ROS node for the combined application
             rospy.init_node('combined_app_node')
 
@@ -184,9 +198,12 @@ def execute_menu(choice):
         print("Invalid choice. Please try again. Enter 'menu' to see the options.")
     return True
 
+# Main program loop handling login and menu execution
 def main():
     print_intro()
     logged_in = False
+
+    # Login/signup loop
     while (logged_in == False):
         print("Press 1 to log in")
         print("Press 2 to sign up")
@@ -203,6 +220,7 @@ def main():
 
     print_menu()
 
+    # Main program loop
     continue_program = True
     while continue_program:
         print("Enter 'menu' to see the options again")

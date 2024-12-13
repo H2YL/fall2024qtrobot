@@ -1,14 +1,16 @@
+# Import required libraries for API interaction, file handling, and date operations
 import os
 from openai import OpenAI
 import csv
 from datetime import datetime, timedelta
 
-# Initialize OpenAI API
+# Initialize OpenAI client with API key
 client = OpenAI(api_key="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")
 
-# Get the current date using a system call
+# Get current date from system
 current_date = os.popen('date +%Y-%m-%d').read().strip()
 
+# Retrieve and display yesterday's tasks
 def get_yesterday_tasks():
     yesterday = (datetime.now() - timedelta(days=1)).strftime('%a, %b %d')
     yesterday_tasks = []
@@ -27,7 +29,7 @@ if (len(yesterday_tasks) == 0):
     print("no tasks yesterday")
     exit()
 
-# Initialize conversation history
+# Initialize conversation with system prompt defining QTrobot's personality and behavior
 conversation_history = [
     {"role": "system", "content": f"""You are QTrobot, a humanoid social robot assistant designed to support college students and young adults with ADHD.
 
@@ -50,6 +52,7 @@ Communication guidelines:
 - Handle unexpected inputs gracefully."""}
 ]
 
+# Send user prompt to GPT and get response while maintaining conversation history
 def chat_with_gpt(prompt):
     global conversation_history
     conversation_history.append({"role": "user", "content": prompt})
@@ -61,6 +64,7 @@ def chat_with_gpt(prompt):
     conversation_history.append({"role": "assistant", "content": ai_response})
     return ai_response
 
+# Save prioritized tasks to CSV file
 def save_tasks_to_csv(tasks):
     filename = "2_prioritized_tasks.csv"
     with open(filename, 'w', newline='') as csvfile:
@@ -70,6 +74,7 @@ def save_tasks_to_csv(tasks):
             writer.writerow(task)
     print(f"Tasks saved to {filename}")
 
+# Parse task list from AI response into structured format
 def parse_task_list(response):
     tasks = []
     for line in response.split('\n'):
@@ -84,12 +89,15 @@ def parse_task_list(response):
                     tasks.append([priority, task_name, deadline])
     return tasks
 
+# Main function to handle user interaction and task review process
 def main():
     print("Type 'exit' to end the conversation")
 
+    # Initial prompt to start task review
     response = chat_with_gpt(f"Print out yesterday's tasks, and ask me if I have completed the first task")
     print("QTrobot:", response)
 
+    # Main conversation loop
     while True:
         user_input = input("You: ")
         if user_input.lower() == 'exit':
