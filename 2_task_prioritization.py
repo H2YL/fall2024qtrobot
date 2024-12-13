@@ -1,12 +1,12 @@
 import os
 from openai import OpenAI
-# import rospy
-# from qt_robot_interface.srv import speech_say
+import rospy
+from qt_robot_interface.srv import speech_say
 import csv
 from datetime import datetime
 
 # Initialize ROS node
-#rospy.init_node('qtrobot_chatgpt_chatbot')
+rospy.init_node('qtrobot_chatgpt_chatbot')
 
 # Set up OpenAI API
 client = OpenAI(api_key="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")
@@ -16,7 +16,7 @@ current_date = os.popen('date +%Y-%m-%d').read().strip()
 # print(current_date)
 
 # Set up QTrobot speech service
-# say_service = rospy.ServiceProxy('/qt_robot/speech/say', speech_say)
+say_service = rospy.ServiceProxy('/qt_robot/speech/say', speech_say)
 
 # Initialize conversation history
 conversation_history = [
@@ -105,6 +105,7 @@ def main():
     tasks = []
     response = chat_with_gpt("Tell me who you are and what you can do")
     print("QTrobot:", response)
+    say_service(response)
 
     while True:
         user_input = input("You: ")
@@ -112,12 +113,16 @@ def main():
             break
         
         response = chat_with_gpt(user_input)
-        print("QTrobot:", response)
         
         # Check if the response contains a task list
         if "1." in response and "- " in response:
+            print("QTrobot:", response)
+            say_service("Please look at the terminal for my response")
             tasks = parse_task_list(response)
             print("System: Type 'exit' to end the conversation and save your prioritized task list")
+        else:
+            print("QTrobot:", response)
+            say_service(response)
     
     if tasks:
         save_tasks_to_csv(tasks)
