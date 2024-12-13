@@ -9,6 +9,9 @@ import rospy
 import threading
 import time
 
+from engagement_main import MainApp
+from emotion_main import EmotionMonitor
+
 def print_divider():
     print("==========================================")
 
@@ -151,11 +154,26 @@ def execute_menu(choice):
     elif choice == '7':
         if os.path.exists("2_prioritized_tasks.csv"):
             #run Mira's code
-            original_dir = os.getcwd()
-            env = os.environ.copy()
-            os.chdir("focus_session")
-            subprocess.run(['python', 'combined_main.py'], env=env)
-            os.chdir(original_dir)
+            # Initialize a ROS node for the combined application
+            rospy.init_node('combined_app_node')
+
+            # Create instances of both main applications
+            engagement_app = MainApp()
+            emotion_monitor = EmotionMonitor()
+
+            # Run each in a separate thread
+            engagement_thread = threading.Thread(target=engagement_app.run)
+            emotion_thread = threading.Thread(target=emotion_monitor.run)
+
+            engagement_thread.start()
+            emotion_thread.start()
+
+            # Keep the main thread alive until shutdown
+            try:
+                while not rospy.is_shutdown():
+                    time.sleep(1)
+            except KeyboardInterrupt:
+                pass
         else:
             print("You must complete step 2 before this step.")
     elif choice.lower() == 'menu':
