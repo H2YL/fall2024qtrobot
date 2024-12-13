@@ -8,13 +8,15 @@ from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/calendar.readonly"]
+SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
 def main():
     """Fetches events from the user's primary Google Calendar and exports them to a CSV file."""
     creds = None
+    
     if os.path.exists("token.json"):
         creds = Credentials.from_authorized_user_file("token.json", SCOPES)
+    
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
@@ -32,20 +34,24 @@ def main():
         # Calculate the time range
         now = datetime.datetime.utcnow()
         seven_days_later = now + datetime.timedelta(days=7)
-
         now = now.isoformat() + "Z"  # 'Z' indicates UTC time
         seven_days_later = seven_days_later.isoformat() + "Z"
 
-        # print("Fetching events for the next 7 days")
-        events_result = service.events().list(calendarId='primary', 
-                                              timeMin=now,
-                                              timeMax=seven_days_later,
-                                              singleEvents=True,
-                                              orderBy='startTime').execute()
+        events_result = service.events().list(
+            calendarId='primary',
+            timeMin=now,
+            timeMax=seven_days_later,
+            singleEvents=True,
+            orderBy='startTime'
+        ).execute()
 
         events = events_result.get('items', [])
+        filtered_events = [
+            event for event in events 
+            if 'dateTime' in event['start']
+        ]
 
-        if not events:
+        if not filtered_events:
             print('No events found in the next 7 days.')
             return
 
@@ -54,10 +60,10 @@ def main():
             csvwriter = csv.writer(csvfile)
             csvwriter.writerow(['eventName', 'startDate', 'startTime', 'endDate', 'endTime'])
 
-            for event in events:
+            for event in filtered_events:
                 summary = event.get('summary', 'No Title')
-                start = event['start'].get('dateTime', event['start'].get('date'))
-                end = event['end'].get('dateTime', event['end'].get('date'))
+                start = event['start']['dateTime']
+                end = event['end']['dateTime']
 
                 # Parse start and end times
                 start_datetime = datetime.datetime.fromisoformat(start.replace('Z', '+00:00'))

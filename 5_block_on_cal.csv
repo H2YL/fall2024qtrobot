@@ -1,17 +1,14 @@
-Event name,startDate,startTime,endDate,endTime
-Breakfast and Morning Routine,2024-11-26,- 08:00,2024-11-26,09:15
-Europcar,2024-11-26,- 09:15,2024-11-26,09:45
-Break,2024-11-26,- 09:45,2024-11-26,10:00
-Social Robot for ADHD Capstone,2024-11-26,- 10:00,2024-11-26,11:00
-Break,2024-11-26,- 11:00,2024-11-26,11:15
-Review lecture slides (Study for Math test),2024-11-26,- 11:15,2024-11-26,12:15
-Lunch,2024-11-26,- 12:15,2024-11-26,13:15
-Brainstorm (Write an Essay),2024-11-26,- 13:15,2024-11-26,14:15
-Break,2024-11-26,- 14:15,2024-11-26,14:30
-Read research papers (Capstone),2024-11-26,- 14:30,2024-11-26,15:30
-Break,2024-11-26,- 15:30,2024-11-26,15:45
-Flexible Study Time,2024-11-26,- 15:45,2024-11-26,17:00
-Break,2024-11-26,- 17:00,2024-11-26,17:15
-Exercise/Physical Activity,2024-11-26,- 17:15,2024-11-26,18:15
-Dinner,2024-11-26,- 18:15,2024-11-26,19:15
-Relaxation/Free Time,2024-11-26,- 19:15,2024-11-26,20:00
+eventName,startDate,startTime,endDate,endTime
+Review lecture slides,2024-12-14,08:00,2024-12-14,09:30
+Short Break,2024-12-14,09:30,2024-12-14,09:45
+Read research papers,2024-12-14,09:45,2024-12-14,11:15
+Meal Break,2024-12-14,11:15,2024-12-14,11:45
+Read research papers,2024-12-14,11:45,2024-12-14,13:15
+Short Break,2024-12-14,13:15,2024-12-14,13:30
+Prepare a presentation,2024-12-14,13:30,2024-12-14,15:00
+Short Break,2024-12-14,15:00,2024-12-14,15:15
+Prepare a presentation,2024-12-14,15:15,2024-12-14,16:45
+Short Break,2024-12-14,16:45,2024-12-14,17:00
+Prepare a presentation,2024-12-14,17:00,2024-12-14,18:30
+Short Break,2024-12-14,18:30,2024-12-14,18:45
+Free time / Relaxation,2024-12-14,18:45,2024-12-14,20:00

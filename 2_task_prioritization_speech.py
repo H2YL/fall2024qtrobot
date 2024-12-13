@@ -105,7 +105,7 @@ def main():
     tasks = []
     response = chat_with_gpt("Tell me who you are and what you can do")
     print("QTrobot:", response)
-    #say_service(response)
+    say_service(response)
 
     while True:
         user_input = input("You: ")
@@ -117,12 +117,12 @@ def main():
         # Check if the response contains a task list
         if "1." in response and "- " in response:
             print("QTrobot:", response)
-            #say_service("Please look at the terminal for my response")
+            say_service("Please look at the terminal for my response")
             tasks = parse_task_list(response)
             print("System: Type 'exit' to end the conversation and save your prioritized task list")
         else:
             print("QTrobot:", response)
-            #say_service(response)
+            say_service(response)
     
     if tasks:
         save_tasks_to_csv(tasks)

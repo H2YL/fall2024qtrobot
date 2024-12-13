@@ -9,28 +9,6 @@ from googleapiclient.errors import HttpError
 
 SCOPES = ["https://www.googleapis.com/auth/calendar"]
 
-def import_schedule():
-    # Read the CSV file
-    df = pd.read_csv('5_block_on_cal.csv')
-    events = []
-
-    # Convert each row into the desired format
-    for _, row in df.iterrows():
-        event = {
-            'summary': row['Event name'],
-            'start': {
-                'dateTime': f"{row['startDate']}T{row['startTime']}+04:00",
-                'timeZone': 'Asia/Dubai',
-            },
-            'end': {
-                'dateTime': f"{row['endDate']}T{row['endTime']}+04:00",
-                'timeZone': 'Asia/Dubai',
-            },
-        }
-        events.append(event)
-
-    return events
-
 def get_existing_events(service):
     # Fetch existing events from the calendar
     now = datetime.datetime.utcnow().isoformat() + 'Z'  # 'Z' indicates UTC time
@@ -38,6 +16,43 @@ def get_existing_events(service):
                                           maxResults=100, singleEvents=True,
                                           orderBy='startTime').execute()
     return {event['summary']: event for event in events_result.get('items', [])}
+
+def import_schedule():
+    # Read the CSV file
+    df = pd.read_csv('5_block_on_cal.csv')
+    events = []
+
+    # Function to append ':00' to time if seconds are missing
+    def ensure_seconds(time_str):
+        if len(time_str.split(":")) == 2:  # Check if time is in HH:MM format
+            return time_str + ":00"
+        return time_str  # Already in HH:MM:SS format
+
+    # Convert each row into the desired format
+    for _, row in df.iterrows():
+        try:
+            start_time = ensure_seconds(row['startTime'])
+            end_time = ensure_seconds(row['endTime'])
+            
+            event = {
+                'summary': row['eventName'],
+                'start': {
+                    'dateTime': f"{row['startDate']}T{start_time}+04:00",
+                    'timeZone': 'Asia/Dubai',
+                },
+                'end': {
+                    'dateTime': f"{row['endDate']}T{end_time}+04:00",
+                    'timeZone': 'Asia/Dubai',
+                },
+            }
+            events.append(event)
+        except KeyError as e:
+            print(f"Missing column in row: {row}. Error: {e}")
+        except Exception as e:
+            print(f"Error processing row: {row}. Error: {e}")
+
+    return events
+
 
 def main():
     creds = None
@@ -57,17 +72,17 @@ def main():
     try:
         service = build("calendar", "v3", credentials=creds)
         events_to_add = import_schedule()
-        
+
         existing_events = get_existing_events(service)
 
         for event in events_to_add:
-            # Check if the event already exists in the calendar
-            if event['summary'] not in existing_events:
-                created_event = service.events().insert(calendarId='primary', body=event).execute()
-                # print('Event created:', (created_event.get('htmlLink')))
-            # else:
-                # print(f"Event '{event['summary']}' already exists and will not be added.")
-
+            try:
+                if event['summary'] not in existing_events:
+                    created_event = service.events().insert(calendarId='primary', body=event).execute()
+                else:
+                    print(f"Event '{event['summary']}' already exists and will not be added.")
+            except HttpError as error:
+                print(f"An error occurred for event {event}: {error}")
     except HttpError as error:
         print(f"An error occurred: {error}")
 

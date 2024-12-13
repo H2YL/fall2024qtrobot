@@ -48,26 +48,31 @@ def parse_schedule_to_csv(input_text, output_file, date):
     lines = input_text.strip().split('\n')
     schedule_start = next(i for i, line in enumerate(lines) if '|' in line)
     schedule_lines = lines[schedule_start:]
-
     events = []
+    
     for line in schedule_lines:
         if ' - ' in line and '|' in line:
             time_range, event_name = line.split('|')
             start_time, end_time = time_range.strip().split(' - ')
+            # Remove the leading hyphen and spaces from times
+            start_time = start_time.strip('- ').strip()
+            end_time = end_time.strip()
+            
             events.append({
-                'Event name': event_name.strip(),
+                'eventName': event_name.strip(),
                 'startDate': date,
-                'startTime': start_time.strip(),
+                'startTime': start_time,
                 'endDate': date,
-                'endTime': end_time.strip()
+                'endTime': end_time
             })
 
     with open(output_file, 'w', newline='') as csvfile:
-        fieldnames = ['Event name', 'startDate', 'startTime', 'endDate', 'endTime']
+        fieldnames = ['eventName', 'startDate', 'startTime', 'endDate', 'endTime']
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for event in events:
             writer.writerow(event)
+
 
 def main():
     print("Type 'exit' to end the conversation")
@@ -81,22 +86,13 @@ def main():
     Print it in the following format:
     
     "startTime" - "endTime" | "eventName".
-    - 08:00 - 09:15 | Breakfast and Morning Routine
-    - 09:15 - 09:45 | Europcar
-    - 09:45 - 10:00 | Break
-    - 10:00 - 11:00 | Social Robot for ADHD Capstone
-    - 11:00 - 11:15 | Break
-    - 11:15 - 12:15 | Review lecture slides (Study for Math test)
-    - 12:15 - 13:15 | Lunch
-    - 13:15 - 14:15 | Brainstorm (Write an Essay)
-    - 14:15 - 14:30 | Break
-    - 14:30 - 15:30 | Read research papers (Capstone)
-    - 15:30 - 15:45 | Break
-    - 15:45 - 17:00 | Flexible Study Time
-    - 17:00 - 17:15 | Break
-    - 17:15 - 18:15 | Exercise/Physical Activity
-    - 18:15 - 19:15 | Dinner
-    - 19:15 - 20:00 | Relaxation/Free Time
+    - 08:00 - 09:15 | exampleA
+    - 09:15 - 09:45 | exampleB
+    - 09:45 - 10:00 | exampleC
+    ...
+    - 16:30 - 18:00 | exampleD
+    - 18:00 - 18:15 | exampleE
+    - 19:45 - 20:00 | exampleF
     
     Ask me if I want to make any changes''')
 
