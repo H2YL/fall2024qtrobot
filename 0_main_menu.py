@@ -145,9 +145,14 @@ def execute_menu(choice):
         else:
             print("You must complete step 5 before this step.")
     elif choice == '7':
-        # run Mira's code
-        print("Option 7 not implemented yet")
-        print("This will start a focus session")
+        if os.path.exists("2_prioritized_tasks.csv"):
+            #run Mira's code
+            original_dir = os.getcwd()
+            os.chdir("focus_session")
+            subprocess.run(['python', 'combined_main.py'])
+            os.chdir(original_dir)
+        else:
+            print("You must complete step 2 before this step.")
     elif choice.lower() == 'menu':
         print_menu()
     elif choice.lower() == 'exit':
