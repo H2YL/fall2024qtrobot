@@ -13,7 +13,7 @@ client = OpenAI(api_key="sk-proj-DGoJZhHS7xe7q5OgJIUDq0W6fywwLa3t_PIRyW01AsRdCSe
 current_date = os.popen('date +%Y-%m-%d').read().strip()
 
 # Load and convert prioritized tasks from CSV to dictionary
-df = pd.read_csv("prioritized_tasks.csv")
+df = pd.read_csv("2_prioritized_tasks.csv")
 prioritized_tasks = df.to_dict(orient='records')
 
 def get_next_seven_days():
