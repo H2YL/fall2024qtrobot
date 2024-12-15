@@ -17,6 +17,7 @@ class TerminalFilter:
     def __init__(self, original_stdout):
         self._original_stdout = original_stdout
         self.keep_pattern = re.compile(r'(Alex:)', re.IGNORECASE)
+        self.keep_pattern = re.compile(r'(User:)', re.IGNORECASE)
         self.buffer = ""
 
     def write(self, text):
