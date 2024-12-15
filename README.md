@@ -1,7 +1,7 @@
 # fall2024qtrobot
 
 To test:
-- run ```python3 frame_server.py``` in one terminal
+- run ```python3 server.py``` in one terminal
 - run ```python3 0_main_menu.py``` in another terminal
 - Use user1 and pass1 to log in (or sign up and make an account)
 

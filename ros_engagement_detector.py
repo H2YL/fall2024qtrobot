@@ -10,13 +10,13 @@ from engagement_detector import EngagementDetector
 from time_serie_in_image import TimeSerieInImage
 
 import threading
-from frame_client import FrameClient
+from client import VideoStreamClient
 class ROSEngagementDetector():
     def __init__(self, plot_in_image=True, out_image_topic="/engagement_detector/out_image"):
         self.plot_in_image = plot_in_image
         self.bridge = CvBridge()
         self.detector = EngagementDetector()
-        self.frame_client = FrameClient(host="127.0.0.1", port=3000)
+        self.client = VideoStreamClient(host="127.0.0.1", port=3000)
         # Initialize the webcam (change index as necessary)
         # self.cap = cv2.VideoCapture(6)  # Change the index if necessary
 
@@ -47,7 +47,7 @@ class ROSEngagementDetector():
         #     rospy.logwarn("Failed to capture image from webcam.")
         #     return None
         # return cv_image
-        frame = self.frame_client.get_frame()
+        frame = self.client.receive_frame()
         if frame is None:
             rospy.logwarn("No frame received from FrameProvider.")
         return frame
@@ -109,7 +109,7 @@ class ROSEngagementDetector():
 
         # Release the webcam and close any OpenCV windows when shutting down
         # self.cap.release()
-        self.frame_client.close()
+        self.client.close()
         cv2.destroyAllWindows()
 
 if __name__ == "__main__":

@@ -12,42 +12,72 @@ import signal
 import logging
 import fcntl
 
-LOCK_FILE = "/tmp/conversation.lock"
-if os.path.exists(LOCK_FILE):
-    os.remove(LOCK_FILE)
+   
+ENGAGEMENT_CONV_LOCK = "/tmp/conversation.lock"
 
-def acquire_lock():
+# Remove any stale lock file on startup
+if os.path.isfile(ENGAGEMENT_CONV_LOCK):
+    os.remove(ENGAGEMENT_CONV_LOCK)
+
+def try_engagement_lock():
+    """
+    Attempt to create and lock the engagement conversation file.
+    Returns True if successful, False otherwise.
+    """
+    if os.path.exists(ENGAGEMENT_CONV_LOCK):
+        # Lock file already present; cannot acquire
+        return False
     try:
-        if os.path.exists(LOCK_FILE):
-            return False
-        lock_file = open(LOCK_FILE, "w+")
+        # Create and write lock info
+        with open(ENGAGEMENT_CONV_LOCK, 'w') as lf:
+            lf.write("locked by engagement detection.\n")
+            lf.flush()
+        # Acquire the file lock using EXclusive + NonBlocking flags
+        lock_file = open(ENGAGEMENT_CONV_LOCK, 'r+')
         fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
-        lock_file.write("locked by engagement detection.\n")
-        lock_file.flush()
+        # Immediately unlock the file handle here (or keep it open if you prefer)
+        fcntl.flock(lock_file, fcntl.LOCK_UN)
         lock_file.close()
         return True
     except IOError:
         return False
+    except Exception as e:
+        print(f"Error while acquiring engagement lock: {e}")
+        return False
 
-def release_lock():
+def free_engagement_lock():
+    """
+    Unlock and remove the engagement conversation lock file.
+    """
+    if not os.path.isfile(ENGAGEMENT_CONV_LOCK):
+        return  # Nothing to release
     try:
-        lock_file = open(LOCK_FILE, "r+")
+        lock_file = open(ENGAGEMENT_CONV_LOCK, 'r+')
         fcntl.flock(lock_file, fcntl.LOCK_UN)
         lock_file.close()
-        print("Lock released.")
-        os.remove(LOCK_FILE)
+        os.remove(ENGAGEMENT_CONV_LOCK)
+        print("Engagement lock released.")
     except Exception as e:
-        print(f"Error releasing lock: {e}")
+        print(f"Error freeing engagement lock: {e}")
 
-def release_lock_with_delay(delay_seconds):
-    def delay_release():
-        lock_file = open(LOCK_FILE, "a")
-        lock_file.write("Releasing engagement lock in 2 minutes.\n")
-        lock_file.flush()
-        lock_file.close()
-        time.sleep(delay_seconds)
-        release_lock()
-    threading.Thread(target=delay_release, daemon=True).start()
+def free_engagement_lock_with_delay(delay_seconds):
+    """
+    Schedule a delayed release of the engagement lock.
+    Writes a note to the lock file indicating a future release,
+    then removes the file after the delay.
+    """
+    def _delayed_release():
+        try:
+            with open(ENGAGEMENT_CONV_LOCK, 'a') as lf:
+                lf.write("Releasing engagement lock in 2 minutes.\n")
+                lf.flush()
+            time.sleep(delay_seconds)
+            free_engagement_lock()
+        except Exception as e:
+            print(f"Error in delayed lock release: {e}")
+
+    threading.Thread(target=_delayed_release, daemon=True).start()
+
 
 class MainApp:
     def __init__(self):
@@ -138,7 +168,7 @@ class MainApp:
                     current_time = time.time()
                     if not self.is_conversation_active and \
                        (self.last_conversation_time is None or (current_time - self.last_conversation_time) > self.cooldown_period):
-                        if acquire_lock():
+                        if try_engagement_lock():
                             self.conversation_requested = True
                         else:
                             print("Conversation locked by another script.")
@@ -168,7 +198,7 @@ class MainApp:
             self.last_conversation_time = time.time()
             self.display_engagement_pub.publish(Bool(True))
             self.pomodoro_timer.resume()
-            release_lock_with_delay(100)
+            free_engagement_lock_with_delay(100)
             print("Lock will be released in 2 minutes.")
             self.resume_engagement_detector()
 

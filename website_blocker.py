@@ -38,10 +38,10 @@ def create_backup():
     if not os.path.exists(hosts_backup_path):
         print("Backing up the hosts file...")
         shutil.copyfile(hosts_file_path, hosts_backup_path)
-        print("Backup created.")
+        #print("Backup created.")
     else:
-        print("Backup already exists.")
-
+        #print("Backup already exists.")
+	pass
 # Function to restore the original hosts file from the backup
 def restore_backup():
     if os.path.exists(hosts_backup_path):

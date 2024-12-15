@@ -8,7 +8,8 @@ from qt_robot_interface.srv import behavior_talk_text
 from std_msgs.msg import String
 import os
 import fcntl
-LOCK_FILE = "/tmp/conversation.lock"
+CONVERSATION_LOCK_PATH = "/tmp/qt_robot_conversation.lock"
+
 
 class PomodoroTimer:
     def __init__(self):
@@ -32,29 +33,62 @@ class PomodoroTimer:
         self.lock_monitor_thread.daemon = True 
         self.lock_monitor_thread.start() 
     
-    def monitor_lock_file(self): 
-        while not rospy.is_shutdown(): 
-            if os.path.exists(LOCK_FILE): 
-                lock_file = open(LOCK_FILE, "r+")
-                fcntl.flock(lock_file, fcntl.LOCK_SH)
-                lines = lock_file.readlines()
-                lock_file.close()
-               
-                if any("locked by emotion detection." in line for line in lines): 
-                    # print("are we there???")
-                    if any("Releasing emotion lock in 2 minutes." in line for line in lines): 
-                        if self.paused: # Resume if the lock is released 
-                            rospy.loginfo("Lock released detected. Resuming Pomodoro timer.") 
-                            self.resume() 
-                    else: 
-                        if not self.paused: # Pause if conversation is ongoing 
-                            rospy.loginfo("Emotion Lock file detected. Pausing Pomodoro timer.") 
-                            self.pause()
-            # else: # No lock file; ensure the timer is not paused 
-            #     if self.paused: 
-            #         rospy.loginfo("Lock file removed. Resuming Pomodoro timer.") 
-            #         self.resume() 
-            time.sleep(1) # Check every second
+    def monitor_lock_file(self):
+        """
+        Monitor /tmp/conversation.lock once per second.
+        If the file is locked by emotion detection (and no 'release' marker), pause the timer.
+        If the file indicates it will be released soon, resume the timer if it was paused.
+        """
+        while not rospy.is_shutdown():
+            locked, locked_by_emotion, releasing_soon = self.check_lock_status()
+
+            if locked and locked_by_emotion:
+                # If the lock is active and not releasing soon, we pause the Pomodoro.
+                if not releasing_soon:
+                    if not self.paused:
+                        rospy.loginfo("Emotion lock detected. Pausing Pomodoro timer.")
+                        self.pause()
+                else:
+                    # If the file indicates lock release is upcoming, resume if paused.
+                    if self.paused:
+                        rospy.loginfo("Lock release detected. Resuming Pomodoro timer.")
+                        self.resume()
+            else:
+                # If there's no lock file or it's not emotion-based, resume if paused
+                # (That way we don't stay stuck in 'paused' if the file is removed).
+                if self.paused and locked_by_emotion is None:
+                    rospy.loginfo("No emotion lock or file removed. Resuming Pomodoro timer.")
+                    self.resume()
+
+            time.sleep(1)
+
+    def check_lock_status(self):
+        """
+        Returns a tuple: (locked: bool, locked_by_emotion: bool or None, releasing_soon: bool)
+          locked: True if lock file exists at all
+          locked_by_emotion: True if the file indicates it's locked by emotion detection;
+                             False if locked by something else;
+                             None if no lock file exists.
+          releasing_soon: True if the file indicates lock release text is present
+        """
+        if not os.path.exists(CONVERSATION_LOCK_PATH):
+            return (False, None, False)
+
+        locked = True
+        locked_by_emotion = False
+        releasing_soon = False
+
+        try:
+            with open(CONVERSATION_LOCK_PATH, "r") as lock_file:
+                content = lock_file.read()
+                if "Locked by Emotion Detector." in content:
+                    locked_by_emotion = True
+                if "Freeing lock by Emotion detector in 2 minutes." in content:
+                    releasing_soon = True
+        except Exception as e:
+            rospy.logerr(f"Error reading lock file: {e}")
+
+        return (locked, locked_by_emotion, releasing_soon)
 
     def talk(self, text):
         try:
@@ -69,14 +103,8 @@ class PomodoroTimer:
         self.state_pub.publish('work')
         self.talking_pub.publish('stop')
         time.sleep(1)
-        # if os.path.exists(LOCK_FILE):
-        #     with open(LOCK_FILE, 'r') as f:
-        #         for line in f:
-        #             if line.strip() == "Releasing lock in 2 minutes.":
-        #                 self.talk("Your work session has started.")
-        #                 break
-        # else:
-        self.talk("Your work session has started.")
+
+        #self.talk("Your work session has started.")
         time.sleep(1)
         self.talking_pub.publish('start')
         self.stop_event.clear()
@@ -87,28 +115,6 @@ class PomodoroTimer:
             args=(self.pomodoro_duration, self.finish_pomodoro)
         )
         self.timer_thread.start()
-
-    # def run_timer(self, duration, callback):
-    #     flag = False
-    #     short_break = False
-    #     if flag == False and duration == self.short_break_duration:
-    #         flag = True
-    #         short_break = True
-
-    #     if short_break == True:
-    #         remaining_time = duration
-    #         # print(remaining_time)
-    #         while remaining_time > 0 and not self.stop_event.is_set():
-    #             if self.paused:
-    #                 time.sleep(1)
-    #                 continue
-                
-    #             time.sleep(1)
-    #             remaining_time -= 1
-    #     else:
-
-    #     if not self.stop_event.is_set():
-    #         callback()
 
     def run_timer(self, duration, callback):
         flag = False
@@ -135,18 +141,8 @@ class PomodoroTimer:
             self.current_emotion = None
             while remaining_time > 0 and not self.stop_event.is_set():
                 if self.paused:
-                    # When paused, stop displaying the current emotion
-                    self.stop_displaying_emotion()
                     time.sleep(1)
                     continue
-
-                # If not paused and no current emotion is being displayed, display the nearest video
-                if self.current_emotion is None and not self.paused:
-                    
-                    nearest_time = self.find_nearest_video(remaining_time)
-                    print(remaining_time, nearest_time)
-                    self.display_emotion(nearest_time)  # Display the new emotion
-                    self.current_emotion = nearest_time
 
                 time.sleep(1)
                 remaining_time -= 1
@@ -154,32 +150,6 @@ class PomodoroTimer:
         if not self.stop_event.is_set():
             self.stop_displaying_emotion()
             callback()
-
-    def find_nearest_video(self, remaining_time):
-        video_duration = 10  
-
-        # Round down the remaining time to the nearest video duration (floor division)
-        nearest_time = (remaining_time // video_duration) * video_duration
-
-        return nearest_time
-
-    def display_emotion(self, remaining_time):
-        # Publish to the robot's interface based on the remaining time
-        video_name = f"work_videos/{remaining_time:04d}"  # Assuming videos are named based on remaining time
-        print(video_name)
-        rospy.loginfo(f"Time remaining: {video_name} seconds")
-        self.emotion_publisher.publish(video_name)
-
-    def stop_displaying_emotion(self):
-        # Stop the current video from being displayed
-        # if self.current_emotion is not None:
-        
-        # self.emotion_publisher.publish('stop')
-        if self.current_emotion is not None:
-            rospy.loginfo("Stopping current emotion video.")
-            import subprocess
-            subprocess.run('rosservice call /qt_robot/emotion/stop "{}"', shell=True, check=True)
-        self.current_emotion = None  # Reset current emotion when paused
 
     def finish_pomodoro(self):
         self.talk("Your Pomodoro session has ended!")
@@ -196,13 +166,6 @@ class PomodoroTimer:
         self.start_engagement_pub.publish('stop')
         self.talking_pub.publish('stop')
         time.sleep(1)
-        # if os.path.exists(LOCK_FILE):
-        #     with open(LOCK_FILE, 'r') as f:
-        #         for line in f:
-        #             if line.strip() == "Releasing lock in 2 minutes.":
-        #                 self.talk("Your short break has started. You can relax for a while.")
-        #                 break
-        # else:
         self.talk("Your short break has started. You can relax for a while.")
         
         time.sleep(1)

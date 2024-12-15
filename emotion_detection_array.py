@@ -6,16 +6,16 @@ import time
 import rospy
 from qt_robot_interface.srv import behavior_talk_text
 from std_msgs.msg import String
-from frame_client import FrameClient
+from client import VideoStreamClient
 
 
 class EmotionDetector:
     def __init__(self, host="127.0.0.1", port=3000):
         rospy.wait_for_service('/qt_robot/behavior/talkText')
         self.talkText = rospy.ServiceProxy('/qt_robot/behavior/talkText', behavior_talk_text)
-        self.talkText("I will beginn a pomodoro session shortly and block some distracting websites to help you stay focused. We will work for 25 minutes and then take a short break. Best of luck, my friend! Let's do this.")
+        self.talkText("I will start the focus session soon! Good luck you got this!")
         time.sleep(20)
-        self.frame_client = FrameClient(host, port)
+        self.client = VideoStreamClient(host, port)
         self.emotion_history = []
         self.last_detection_time = time.time()
         self.detection_interval_sec = 5  # Detect emotion every 5 seconds
@@ -23,14 +23,7 @@ class EmotionDetector:
         self.first_frame = True
 
     def detect_emotion(self):
-        # ret, frame = self.cap.read()
-        # if not ret:
-        #     rospy.logerr("Can't receive frame. Exiting...")
-        #     return None, None
-        # if self.first_frame == True:
-        #     time.sleep(40)
-        #     self.first_frame = False
-        frame = self.frame_client.get_frame()
+        frame = self.client.receive_frame()
 
         if frame is None:
             rospy.logerr("No frames received")
@@ -72,9 +65,7 @@ class EmotionDetector:
         return most_common_emotion
 
     def release_resources(self):
-        # self.cap.release()
-        # cv2.destroyAllWindows()
-        self.frame_client.close()
+        self.client.close()
 
     def display_frame(self, frame, emotion=None):
         if frame is not None:

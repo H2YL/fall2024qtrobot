@@ -9,45 +9,67 @@ import os
 import fcntl
 from working_prompt import start_conversation
 
-LOCK_FILE = "/tmp/conversation.lock"
+EMOTION_CONV_LOCK = "/tmp/conversation.lock"
 
-def acquire_lock():
+def attempt_emotion_lock():
+    """
+    Try to acquire the conversation lock for emotion detection.
+    Returns True if successful; otherwise False.
+    """
+    # If lock file is already present, bail out
+    if os.path.isfile(EMOTION_CONV_LOCK):
+        return False
+
     try:
-        if os.path.exists(LOCK_FILE):
-            return False
-        else:
-            lock_file = open(LOCK_FILE, "w+")
-            fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
-            lock_file.write("locked by emotion detection.\n")
-            lock_file.flush()
-            lock_file.close()
-            return True
+        # Create and mark it locked by emotion detection
+        with open(EMOTION_CONV_LOCK, 'w') as lf:
+            lf.write("locked by emotion detection.\n")
+            lf.flush()
+
+        lock_file = open(EMOTION_CONV_LOCK, 'r+')
+        fcntl.flock(lock_file, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        # Release the handle right away (optional)
+        fcntl.flock(lock_file, fcntl.LOCK_UN)
+        lock_file.close()
+        return True
     except IOError:
         return False
     except Exception as e:
-        print(f"An error occurred: {e}")
+        print(f"Error acquiring emotion lock: {e}")
         return False
 
-def release_lock():
+def release_emotion_lock():
+    """
+    Immediately unlock and remove the emotion lock file.
+    """
+    if not os.path.isfile(EMOTION_CONV_LOCK):
+        return
     try:
-        lock_file = open(LOCK_FILE, "r+")
+        lock_file = open(EMOTION_CONV_LOCK, 'r+')
         fcntl.flock(lock_file, fcntl.LOCK_UN)
         lock_file.close()
-        print("Lock released.")
-        os.remove(LOCK_FILE)
+        os.remove(EMOTION_CONV_LOCK)
+        print("Emotion lock released.")
     except Exception as e:
-        print(f"Error releasing lock: {e}")
+        print(f"Error releasing emotion lock: {e}")
 
-def release_lock_with_delay(delay_seconds):
-    def delay_release():
-        lock_file = open(LOCK_FILE, "a")
-        lock_file.write("Releasing emotion lock in 2 minutes.")
-        lock_file.flush()
-        lock_file.close()
-        time.sleep(delay_seconds)
-        release_lock()
-    threading.Thread(target=delay_release, daemon=True).start()
+def release_emotion_lock_with_delay(delay_seconds):
+    """
+    Writes a message to the lock file and then releases it after delay_seconds.
+    """
+    def _delay_unlock():
+        try:
+            with open(EMOTION_CONV_LOCK, 'a') as lf:
+                lf.write("Releasing emotion lock in 2 minutes.")
+                lf.flush()
+            time.sleep(delay_seconds)
+            release_emotion_lock()
+        except Exception as e:
+            print(f"Error in delayed emotion lock release: {e}")
 
+    threading.Thread(target=_delay_unlock, daemon=True).start()
+    
+ 
 class EmotionMonitor:
     def __init__(self):
         print("Starting Emotion Monitor...")
@@ -58,9 +80,9 @@ class EmotionMonitor:
 
         self.is_conversation_active = False
         self.last_conversation_time = 0
-        self.conversation_cooldown = 120
+        self.conversation_cooldown = 300
 
-        self.analysis_interval = 30
+        self.analysis_interval = 60
         self.emotion_detector.max_history_size = int(self.analysis_interval / self.emotion_detector.detection_interval_sec)
 
         self.last_check_time = time.time()
@@ -112,7 +134,7 @@ class EmotionMonitor:
             emotion = next((e for e in reversed(self.emotion_detector.emotion_history) if self.is_negative_emotion(e)), "sad")
 
         rospy.loginfo(f"Detected negative emotion: {emotion}")
-        if not acquire_lock():
+        if not attempt_emotion_lock():
             print("Conversation locked by another script.")
         else:    
             user_feels_better = start_conversation(emotion)  # Uses working_prompt with input()
@@ -120,7 +142,7 @@ class EmotionMonitor:
                 rospy.loginfo("User feels better now.")
             else:
                 rospy.loginfo("Conversation ended.")
-            release_lock_with_delay(100)
+            release_emotion_lock_with_delay(100)
             print("Lock will be released in 2 minutes.")
             self.last_conversation_time = current_time
         self.is_conversation_active = False
