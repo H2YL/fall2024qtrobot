@@ -148,7 +148,6 @@ class PomodoroTimer:
                 remaining_time -= 1
 
         if not self.stop_event.is_set():
-            self.stop_displaying_emotion()
             callback()
 
     def finish_pomodoro(self):
