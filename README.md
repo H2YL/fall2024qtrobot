@@ -47,6 +47,11 @@ pip install openai[datalib]
 pip install openai[wandb]
 pip install deepface
 ```
+For more information on OpenAI, visit https://openai.com/
+For more information on Notion, visit https://www.notion.so/
+For more information on pandas, visit https://pandas.pydata.org/
+For more information on HTTPX, visit https://www.python-httpx.org/
+For more information on Google Auth OAuthlib, visit https://google-auth-oauthlib.readthedocs.io/
 For more information on DeepFace, visit the [DeepFace documentation](https://pypi.org/project/deepface/).
 
 ### Step 3: Download the Engagement Detection Model
