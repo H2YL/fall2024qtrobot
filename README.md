@@ -6,7 +6,7 @@ Read the entire report [here]().
 
 ## Modules and Features
 - **Conversation**: Facilitates interactive and supportive dialogue through the use of GPT-4o, acting as a virtual productivity coach to assist users in managing tasks and maintaining focus.
-- **Prioritization and Schedule Generation**: Implements advanced task management, including task decomposition, priority setting, and schedule creation using tools like the Eisenhower Matrix.
+- **Task Prioritization and Schedule Generation**: Implements advanced task management, including task decomposition, priority setting, and weekly/daily schedule creation using tools like the Eisenhower Matrix. 
 - **Pomodoro Session**: Provides structured work sessions with timed intervals, break, and website-blocking functionality to minimize distractions.
 - **Engagement Detection**: Continuously monitors the user's attention levels using a deep learning framework to assess and respond to engagement in real time.
 - **Emotion Recognition**: Detects and analyzes the user's emotional state using the DeepFace library, enabling empathetic interactions and tailored responses.
@@ -19,15 +19,15 @@ Before running the code, ensure the following software and libraries are install
 
 1. **DeepFace**: Required for emotion detection.
 2. **Engagement Detection Model**: Used to analyze engagement levels.
-3. **openai**: 
-4. **notion-client**: 
-5. **google-auth-oauthlib**: 
-6. **google-auth**: 
-7. **googleapiclient**: 
-8. **pandas**: 
-9. **numpy**: 
-10. **requests**: 
-11. **httpx (version 0.15.0 or higher)**:
+3. **openai**: Enables interaction with OpenAI's GPT models for natural language processing and conversation generation
+4. **notion-client**: Provides an interface for interacting with Notion's API to manage tasks and create to-do lists
+5. **google-auth-oauthlib**: Handles OAuth 2.0 authentication flow for Google Calendar integration
+6. **google-auth**: Manages Google API authentication credentials and tokens
+7. **googleapiclient**: Provides access to Google Calendar API for event management and scheduling
+8. **pandas**: Handles data manipulation and analysis for task management and scheduling
+9. **numpy**: Supports numerical operations and data processing for various computations
+10. **requests**: Manages HTTP requests for API interactions and data transfer
+11. **httpx (version 0.15.0 or higher)**: Modern HTTP client with async support for making API requests
 
 ### API Keys and Credentials
 - OpenAI API key
