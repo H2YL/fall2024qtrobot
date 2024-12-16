@@ -1,10 +1,12 @@
 # Leveraging Social Robots to Address Productivity Challenges in College Students with ADHD
-Attention-Deficit Hyperactivity Disorder (ADHD) significantly impacts the academic, social, emotional, and psychological well-being of young adults. While various treatments and medications are available, there remains a notable absence of practical tools tailored to help them navigate their daily challenges. To bridge this gap, our research centers on designing software solutions that integrate seamlessly with the QTrobot, developed by LuxAI. These tools are specifically designed to support students in managing and completing tasks, and they are divided into the following key modules:
-- Conversation
-- Prioritization and Schedule Generation
-- Pomodoro Session
-- Engagement Detection 
-- Emotion Recognition
+Attention-Deficit Hyperactivity Disorder (ADHD) significantly impacts the academic, social, emotional, and psychological well-being of young adults. While various treatments and medications are available, there remains a notable absence of practical tools tailored to help them navigate their daily challenges. To bridge this gap, our research centers on designing software solutions that integrate seamlessly with the QTrobot, developed by LuxAI. 
+
+## Modules and Features
+- **Conversation**: Facilitates interactive and supportive dialogue through the use of GPT-4o, acting as a virtual productivity coach to assist users in managing tasks and maintaining focus.
+- **Prioritization and Schedule Generation**: Implements advanced task management, including task decomposition, priority setting, and schedule creation using tools like the Eisenhower Matrix.
+- **Pomodoro Session**: Provides structured work sessions with timed intervals, break, and website-blocking functionality to minimize distractions.
+- **Engagement Detection**: Continuously monitors the user's attention levels using a deep learning framework to assess and respond to engagement in real time.
+- **Emotion Recognition**: Detects and analyzes the user's emotional state using the DeepFace library, enabling empathetic interactions and tailored responses.
 
 ## Instructions to Run
 
