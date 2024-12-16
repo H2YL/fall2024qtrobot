@@ -1,6 +1,9 @@
 # Leveraging Social Robots to Address Productivity Challenges in College Students with ADHD
 Attention-Deficit Hyperactivity Disorder (ADHD) significantly impacts the academic, social, emotional, and psychological well-being of young adults. While various treatments and medications are available, there remains a notable absence of practical tools tailored to help them navigate their daily challenges. To bridge this gap, our research centers on designing software solutions that integrate seamlessly with the QTrobot, developed by LuxAI. 
 
+Read the entire report [here](). 
+
+
 ## Modules and Features
 - **Conversation**: Facilitates interactive and supportive dialogue through the use of GPT-4o, acting as a virtual productivity coach to assist users in managing tasks and maintaining focus.
 - **Prioritization and Schedule Generation**: Implements advanced task management, including task decomposition, priority setting, and schedule creation using tools like the Eisenhower Matrix.
