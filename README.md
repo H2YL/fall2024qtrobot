@@ -6,12 +6,9 @@ Attention-Deficit Hyperactivity Disorder (ADHD) significantly impacts the academ
 - Engagement Detection 
 - Emotion Recognition
 
-### Instructions to Run
-# README
+## Instructions to Run
 
-This document provides step-by-step instructions for setting up and running the code for our project, which utilizes an emotion detector and an engagement detection model integrated with the QTrobot system.
-
-## Prerequisites
+### Prerequisites
 
 Before running the code, ensure the following software and libraries are installed on your system:
 
@@ -59,11 +56,5 @@ python3 0_main_menu.py
 ## Additional Notes
 
 - Make sure to configure any additional dependencies or environment variables as required by your system.
-
-
-
-To start a new user session
-- run ```make clean``` to delete all csv files and the token.json file
-
-For faster testing
-- The sample files can be copy+pasted from sample_files directory if you want to skip some steps
+- To start a new user session, run ```make clean``` to delete all csv files and the token.json file
+- For faster testing, the sample files can be copy+pasted from sample_files directory if you want to skip some steps
