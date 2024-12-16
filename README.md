@@ -19,20 +19,37 @@ Before running the code, ensure the following software and libraries are install
 
 1. **DeepFace**: Required for emotion detection.
 2. **Engagement Detection Model**: Used to analyze engagement levels.
+3. **openai**: 
+4. **notion-client**: 
+5. **google-auth-oauthlib**: 
+6. **google-auth**: 
+7. **googleapiclient**: 
+8. **pandas**: 
+9. **numpy**: 
+10. **requests**: 
+11. **httpx (version 0.15.0 or higher)**:
+
+### API Keys and Credentials
+- OpenAI API key
+- Notion API integration token/access token
+- Google Calendar API credentials
 
 ## Setup Instructions
 
-### Step 1: Install DeepFace
+### Step 1: Install Required Libraries
 
-DeepFace is used for the emotion detection module. To install it, run the following command in your terminal:
+Run the following commands in your terminal to install the necessary Python libraries:
 
 ```bash
+pip install openai notion-client httpx pandas google-auth-oauthlib
+pip install openai[embeddings]
+pip install openai[datalib]
+pip install openai[wandb]
 pip install deepface
 ```
+For more information on DeepFace, visit the [DeepFace documentation](https://pypi.org/project/deepface/).
 
-For more information, visit the [DeepFace documentation](https://pypi.org/project/deepface/).
-
-### Step 2: Download the Engagement Detection Model
+### Step 3: Download the Engagement Detection Model
 
 Clone the engagement detection repository from GitHub to access the required model files. Run the following command in your terminal:
 
@@ -42,7 +59,14 @@ git clone https://github.com/LCAS/engagement_detector.git
 
 For additional details, refer to the [repository documentation](https://github.com/LCAS/engagement_detector?tab=readme-ov-file).
 
-### Step 3: Set Up the Server
+### Step 4: Set Up API Keys and Credentials
+Ensure you have the necessary API keys and credentials:
+- OpenAI API key
+- Notion API integration token/access token
+- Google Calendar API credentials
+Place these in the appropriate configuration files or environment variables as required by the scripts.
+
+### Step 5: Set Up the Server
 
 The server script (`server.py`) manages communication between different modules. To start the server, run the following command in a terminal:
 
@@ -50,7 +74,7 @@ The server script (`server.py`) manages communication between different modules.
 python3 server.py
 ```
 
-### Step 4: Run the Main Menu Script
+### Step 6: Run the Main Menu Script
 
 In a separate terminal, navigate to the project directory and run the main menu script (`0_main_menu.py`) to begin interacting with the system:
 
@@ -63,3 +87,5 @@ python3 0_main_menu.py
 - Make sure to configure any additional dependencies or environment variables as required by your system.
 - To start a new user session, run ```make clean``` to delete all csv files and the token.json file
 - For faster testing, the sample files can be copy+pasted from sample_files directory if you want to skip some steps
+- When using the Google Calendar API, you may need to set up OAuth 2.0 credentials and handle the authentication flow as shown in the ```6_export_events.py``` script.
+The Notion API integration requires proper setup and permissions as demonstrated in the ```4_notion_push.py``` script.
