@@ -68,7 +68,7 @@ For additional details, refer to the [repository documentation](https://github.c
 Ensure you have the necessary API keys and credentials:
 - OpenAI API key
 - Notion API integration token/access token
-- Google Calendar API credentials
+- Google Calendar API credentials  
 Place these in the appropriate configuration files or environment variables as required by the scripts.
 
 ### Step 5: Set Up the Server
