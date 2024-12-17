@@ -9,16 +9,16 @@ import datetime
 import csv
 
 # Notion API Authentication credentials
-oauth_client_id = "12ed872b-594c-8085-9ec3-00372e156eb1"
-oauth_client_secret = "secret_yo5Gn7B36047cAvlhEj6RD6tiAd4TQ59RXEzbu0pcq4"
-redirect_uri = "https://nyuad.nyu.edu/en/"
+oauth_client_id = ""
+oauth_client_secret = ""
+redirect_uri = ""
 
 # Create OAuth authentication URL
 parsed_redirect_uri = urllib.parse.quote_plus(redirect_uri)
 auth_url = f"https://api.notion.com/v1/oauth/authorize?client_id={oauth_client_id}&response_type=code&owner=user&redirect_uri={parsed_redirect_uri}"
 
 # Authentication code obtained from redirect URL
-auth_code = "035b473c-be50-44c9-a775-fc6595b7381d"
+auth_code = ""
 
 # Encode client credentials for authentication header
 key_secret = f'{oauth_client_id}:{oauth_client_secret}'.encode('ascii')
@@ -39,8 +39,7 @@ auth_data = {
 
 # Request access token
 auth_resp = requests.post(base_url, headers=auth_headers, data=auth_data)
-# access_token = auth_resp.json()['access_token']
-access_token = "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"
+access_token = ""
 
 # Initialize Notion client with access token
 notion = Client(auth=access_token)
