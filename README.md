@@ -91,6 +91,5 @@ python3 0_main_menu.py
 
 - Make sure to configure any additional dependencies or environment variables as required by your system.
 - To start a new user session, run ```make clean``` to delete all csv files and the token.json file
-- For faster testing, the sample files can be copy+pasted from sample_files directory if you want to skip some steps
 - When using the Google Calendar API, you may need to set up OAuth 2.0 credentials and handle the authentication flow as shown in the ```6_export_events.py``` script.
-The Notion API integration requires proper setup and permissions as demonstrated in the ```4_notion_push.py``` script.
+- The Notion API integration requires proper setup and permissions as demonstrated in the ```4_notion_push.py``` script.
