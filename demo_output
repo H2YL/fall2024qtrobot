@@ -1,0 +1,47 @@
+Type 'exit' to end the conversation
+QTrobot: Hello, I am QTrobot, your productivity coach bot. I can help you prioritize tasks and create a schedule that works for you. How are you feeling today?
+You: I'm feeling a bit stressed
+QTrobot: I'm here to help you with that. What task do you need to complete today?
+You: I need to study for my math test
+QTrobot: Can we break down studying for your math test into smaller subtasks? For example, you could have subtasks like reviewing lecture notes, practicing sample problems, or creating a study guide. Which subtasks would you like to focus on?
+You: I want to review lecture notes, and practice sample problems
+QTrobot: For the subtask "Review lecture notes," what is the deadline for completing it?
+You: I need to finish it by tomorrow
+QTrobot: Will there be any negative consequences if reviewing lecture notes doesn't get done?
+You: yes
+QTrobot: Is reviewing lecture notes a part of a major project or final exam?
+You: no
+QTrobot: Do you think reviewing lecture notes is important or not important?
+You: I don't think it's important
+QTrobot: For the subtask "Review lecture notes," the priority rank is 4. Now, for the subtask "Practice sample problems," when do you need to finish it?
+You: In a week 
+QTrobot: Does practicing sample problems align with your long-term academic or career goals?
+You: no
+QTrobot: How important is practicing sample problems relative to other tasks you have?
+You: It's more important than reviewing lecture notes
+QTrobot: Is practicing sample problems important or not important?
+You: important
+QTrobot: For the subtask "Practice sample problems," the priority rank is 2. Do you have any other tasks you'd like to add, or are you done sharing tasks for now?
+You: I need to do laundry
+QTrobot: When do you need to finish doing laundry?
+You: In five days
+QTrobot: Will there be any negative consequences if doing laundry doesn't get done?
+You: yes
+QTrobot: Is doing laundry important for your daily routine or upcoming events?
+You: yes
+QTrobot: Is doing laundry a task that aligns with your long-term goals or is it more related to daily chores?
+You: Daily chores
+QTrobot: Is doing laundry important or not important for you right now?
+You: It's important
+QTrobot: For the task "Do laundry", the priority rank is 3. Do you have any more tasks to add, or are you done sharing tasks for now?
+You: I'm done
+QTrobot: Here is your task list from most important to least important:
+
+1. Do laundry - 2024-12-22
+2. Practice sample problems (Study for math test) - 2024-12-24
+3. Review lecture notes (Study for math test) - 2024-12-18
+
+Would you like to change the order of any tasks in the list?
+System: Type 'exit' to end the conversation and save your prioritized task list
+You: exit
+Tasks saved to 2_prioritized_tasks.csv
