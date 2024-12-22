@@ -1,7 +1,7 @@
 # Leveraging Social Robots to Address Productivity Challenges in College Students with ADHD
 Attention-Deficit Hyperactivity Disorder (ADHD) significantly impacts the academic, social, emotional, and psychological well-being of young adults. While various treatments and medications are available, there remains a notable absence of practical tools tailored to help them navigate their daily challenges. To bridge this gap, our research centers on designing software solutions that integrate seamlessly with the QTrobot, developed by LuxAI. 
 
-Read the entire report [here](https://drive.google.com/file/d/1guJAyeCDhVrbMZWsNeqoN5nifvBb7TUD/view?usp=sharing). 
+Read the entire report [here]([https://drive.google.com/file/d/1guJAyeCDhVrbMZWsNeqoN5nifvBb7TUD/view?usp=sharing](https://drive.google.com/file/d/1NR1xArXdTSeb3dZjmCvjjnME3_LJePbJ/view?usp=sharing)). 
 
 
 ## Modules and Features
